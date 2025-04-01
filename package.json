@@ -19,9 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:e2e": "playwright test",
-    "test:cucumber": "cross-env NODE_OPTIONS=--max-old-space-size=4096 ts-node run-cucumber-tests.js",
-    "cucumber": "cucumber-js",
-    "cucumber:debug": "cross-env NODE_OPTIONS=--inspect cucumber-js"
+    "test:cucumber": "cross-env start-server-and-test 'npm start' http://localhost:3000 'cucumber-js'"
   },
   "eslintConfig": {
     "extends": [
@@ -54,6 +52,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "cross-env": "^7.0.3",
+    "start-server-and-test": "^2.0.11",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "wait-on": "^7.0.1"
