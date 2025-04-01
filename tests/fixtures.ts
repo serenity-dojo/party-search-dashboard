@@ -1,6 +1,6 @@
 // tests/fixtures.ts
 import { test as base } from '@playwright/test';
-import { DashboardPage } from './pages/DashboardPage';
+import { DashboardPage } from '../pages/DashboardPage';
 
 type MyFixtures = {
     dashboardPage: DashboardPage;

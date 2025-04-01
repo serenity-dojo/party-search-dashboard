@@ -5,18 +5,10 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@mui/material": "^7.0.1",
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.126",
-    "@types/react": "^19.0.12",
-    "@types/react-dom": "^19.0.4",
-    "playwright": "^1.51.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "@mui/material": "^5.14.18",
+    "cors": "^2.8.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -26,7 +18,10 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:cucumber": "cross-env NODE_OPTIONS=--max-old-space-size=4096 ts-node run-cucumber-tests.js",
+    "cucumber": "cucumber-js",
+    "cucumber:debug": "cross-env NODE_OPTIONS=--inspect cucumber-js"
   },
   "eslintConfig": {
     "extends": [
@@ -47,6 +42,23 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.51.1"
+    "@cucumber/cucumber": "^8.10.0",
+    "@cucumber/pretty-formatter": "^1.0.0",
+    "@playwright/test": "^1.40.0",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^18.11.18",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "cross-env": "^7.0.3",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "wait-on": "^7.0.1"
+  },
+  "resolutions": {
+    "typescript": "4.9.5"
   }
 }

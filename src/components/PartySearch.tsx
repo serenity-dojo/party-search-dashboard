@@ -1,69 +1,86 @@
 // src/components/PartySearch.tsx
-import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Table,
-  TableBody,
+import React, { useState } from 'react';
+import { 
+  Box, 
+  Typography, 
+  TextField, 
+  Button, 
+  TableContainer, 
+  Table, 
+  TableHead, 
+  TableBody, 
+  TableRow, 
   TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
+  CircularProgress,
+  Pagination
 } from '@mui/material';
-
-interface Party {
-  partyId: string;
-  name: string;
-  type: string;
-  sanctionsStatus: string;
-  matchScore: string;
-}
-
-const columns = [
-  { key: 'partyId', header: 'Party ID' },
-  { key: 'name', header: 'Name' },
-  { key: 'type', header: 'Type' },
-  { key: 'sanctionsStatus', header: 'Sanctions Status' },
-  { key: 'matchScore', header: 'Match Score' },
-];
+import { searchParties, Party, Pagination as PaginationData } from '../services/partyApiService';
 
 const PartySearch: React.FC = () => {
   const [query, setQuery] = useState('');
-  const [parties, setParties] = useState<Party[]>([]);
   const [results, setResults] = useState<Party[]>([]);
-  const [message, setMessage] = useState('');
+  const [pagination, setPagination] = useState<PaginationData>({
+    currentPage: 1,
+    pageSize: 10,
+    totalPages: 0,
+    totalResults: 0
+  });
+  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    // @ts-ignore: Load test data injected into the window
-    const data = window.__PARTIES__;
-    if (data) {
-      // Transform incoming data (from the feature file with human-friendly headers)
-      // into our internal data model with idiomatic keys.
-      const transformed: Party[] = data.map((item: any) => ({
-        partyId: item["Party ID"],
-        name: item["Name"],
-        type: item["Type"],
-        sanctionsStatus: item["Sanctions Status"],
-        matchScore: item["Match Score"],
-      }));
-      setParties(transformed);
-    }
-  }, []);
+  // Columns for the results table
+  const columns = [
+    { key: 'partyId', header: 'Party ID' },
+    { key: 'name', header: 'Name' },
+    { key: 'type', header: 'Type' },
+    { key: 'sanctionsStatus', header: 'Sanctions Status' },
+    { key: 'matchScore', header: 'Match Score' }
+  ];
 
-  const handleSearch = () => {
-    const filtered = parties.filter((party) =>
-      party.partyId.toLowerCase().includes(query.toLowerCase()) ||
-      party.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setResults(filtered);
-    if (filtered.length === 0) {
-      setMessage(`No parties found matching '${query}'`);
-    } else {
-      setMessage('');
+  // Handle search form submission
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    
+    setLoading(true);
+    setMessage(undefined);
+    
+    try {
+      const response = await searchParties({ 
+        query, 
+        page: pagination.currentPage,
+        pageSize: pagination.pageSize 
+      });
+      
+      setResults(response.results);
+      setPagination(response.pagination);
+      
+      if (response.results.length === 0) {
+        setMessage(response.message || `No parties found matching '${query}'`);
+      }
+    } catch (error) {
+      console.error('Error performing search:', error);
+      setMessage('An error occurred while searching. Please try again.');
+      setResults([]);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  // Handle page change
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
+    const newPagination = { ...pagination, currentPage: page };
+    setPagination(newPagination);
+    
+    // Re-fetch with new page
+    searchParties({ 
+      query, 
+      page, 
+      pageSize: pagination.pageSize 
+    }).then(response => {
+      setResults(response.results);
+      setPagination(response.pagination);
+    });
   };
 
   return (
@@ -71,22 +88,53 @@ const PartySearch: React.FC = () => {
       <Typography variant="h5" gutterBottom>
         Party Search
       </Typography>
+      
+      {/* Search Form */}
       <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 2 }}>
         <TextField
           label="Enter party name or ID"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          data-testid="party-search-input"
+          inputProps={{
+            'data-testid': 'party-search-input'
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSearch();
+            }
+          }}
         />
         <Button
           variant="contained"
           onClick={handleSearch}
           data-testid="party-search-button"
+          disabled={loading || !query.trim()}
         >
-          Search
+          {loading ? <CircularProgress size={24} /> : 'Search'}
         </Button>
       </Box>
-      {results.length > 0 && (
+      
+      {/* Loading Indicator */}
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+          <CircularProgress />
+        </Box>
+      )}
+      
+      {/* No Results Message */}
+      {message && !loading && (
+        <Typography 
+          variant="body1" 
+          color="error" 
+          data-testid="no-results-message"
+          sx={{ mt: 2 }}
+        >
+          {message}
+        </Typography>
+      )}
+      
+      {/* Results Table */}
+      {results.length > 0 && !loading && (
         <TableContainer component={Paper}>
           <Table data-testid="search-results-table">
             <TableHead>
@@ -108,17 +156,19 @@ const PartySearch: React.FC = () => {
               ))}
             </TableBody>
           </Table>
+          
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+              <Pagination 
+                count={pagination.totalPages} 
+                page={pagination.currentPage}
+                onChange={handlePageChange}
+                data-testid="search-results-pagination"
+              />
+            </Box>
+          )}
         </TableContainer>
-      )}
-      {message && (
-        <Typography
-          variant="body1"
-          color="error"
-          data-testid="no-results-message"
-          sx={{ mt: 2 }}
-        >
-          {message}
-        </Typography>
       )}
     </Box>
   );
