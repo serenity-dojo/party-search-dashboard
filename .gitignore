@@ -7,6 +7,9 @@
 
 # testing
 /coverage
+cucumber-report.html
+playwright-report
+test-results
 
 # production
 /build
