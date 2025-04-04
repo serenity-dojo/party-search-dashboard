@@ -69,6 +69,38 @@ app.get('/api/parties/search', (req, res) => {
                 totalResults: 1
             }
         });
+    } else if (query === 'P12345') {
+        return res.json({
+            results: [{
+                partyId: "P12345678",
+                name: "Acme Corporation",
+                type: "Organization",
+                sanctionsStatus: "Approved",
+                matchScore: "95%"
+            },
+            {
+                partyId: "P12345999",
+                name: "Big Box Corporation",
+                type: "Organization",
+                sanctionsStatus: "Approved",
+                matchScore: "95%"
+            },
+            {
+                partyId: "P12345888",
+                name: "Legal Law Firm",
+                type: "Organization",
+                sanctionsStatus: "Approved",
+                matchScore: "95%"
+            }
+
+            ],
+            pagination: {
+                currentPage: Number(page),
+                pageSize: Number(pageSize),
+                totalPages: 1,
+                totalResults: 1
+            }
+        });
     } else {
         return res.json({
             results: [],
