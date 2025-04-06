@@ -60,7 +60,7 @@ const PartySearch: React.FC = () => {
   }, [query, shouldFetchSuggestions]);
 
   // Modified search function which accepts an optional query.
-  const handleSearch = async (searchQuery?: string) => {
+  const handleSearch = async (searchQuery?: string, overridePage?: number) => {
     const effectiveQuery = searchQuery ?? query;
     if (!effectiveQuery.trim()) return;
     
@@ -69,7 +69,7 @@ const PartySearch: React.FC = () => {
     try {
       const response = await searchParties({ 
         query: effectiveQuery, 
-        page: pagination.currentPage,
+        page: overridePage ?? pagination.currentPage,
         pageSize: pagination.pageSize 
       });
       
@@ -87,6 +87,7 @@ const PartySearch: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   // When a suggestion is selected (by click or pressing Enter), update the query,
   // clear the suggestions, disable further suggestion fetching, and perform a search.
@@ -95,7 +96,7 @@ const PartySearch: React.FC = () => {
     setSuggestions([]);
     setHighlightedIndex(-1);
     setShouldFetchSuggestions(false);
-    handleSearch(suggestion.name);
+    handleSearch(suggestion.name, 1);
   };
 
   // Keyboard navigation for suggestions.
