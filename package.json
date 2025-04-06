@@ -19,7 +19,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:e2e": "playwright test",
-    "test:cucumber": "cross-env start-server-and-test 'npm start' http://localhost:3000 'cucumber-js'"
+    "test:cucumber": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js\""
   },
   "eslintConfig": {
     "extends": [
