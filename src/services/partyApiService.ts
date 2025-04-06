@@ -39,7 +39,7 @@ export const searchParties = async (params: PartySearchParams): Promise<PartySea
     try {
         console.log('Search Parties Query:', params.query);
 
-        const response = await axios.get(`${API_BASE_URL}/parties/search`, {
+        const response = await axios.get(`${API_BASE_URL}/parties`, {
             params: {
                 query: params.query,
                 page: params.page || 1,

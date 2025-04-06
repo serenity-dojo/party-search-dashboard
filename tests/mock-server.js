@@ -8,7 +8,7 @@ const port = process.env.PORT || 3001;
 // Enable CORS
 app.use(cors());
 
-app.get('/api/parties/search', (req, res) => {
+app.get('/api/parties', (req, res) => {
     const { query, page = 1, pageSize = 10 } = req.query;
 
     // Based on the search query, return different responses.

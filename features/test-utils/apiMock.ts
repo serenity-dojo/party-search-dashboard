@@ -41,7 +41,7 @@ export async function setupPartyApiMock(
         responseBody.message = `No parties found matching '${query}'`;
     }
 
-    await page.route('**/api/parties/search**', async (route) => {
+    await page.route('**/api/parties', async (route) => {
         const url = new URL(route.request().url());
         if (url.searchParams.get('query') === query) {
             await route.fulfill({
