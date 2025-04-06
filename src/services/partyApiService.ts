@@ -37,9 +37,9 @@ export interface PartySearchResponse {
  */
 export const searchParties = async (params: PartySearchParams): Promise<PartySearchResponse> => {
     try {
-        console.log('Search Parties Query:', params.query);
+        console.log('Search Parties Query: ${API_BASE_URL}/parties?query=', params.query);
 
-        const response = await axios.get(`${API_BASE_URL}/parties/search`, {
+        const response = await axios.get(`${API_BASE_URL}/parties`, {
             params: {
                 query: params.query,
                 page: params.page || 1,
@@ -48,6 +48,7 @@ export const searchParties = async (params: PartySearchParams): Promise<PartySea
                 sortDirection: params.sortDirection,
             },
         });
+        console.log('API request:', response.request);
         console.log('API response:', response.data);
         return response.data;
     } catch (error) {

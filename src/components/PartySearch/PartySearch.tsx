@@ -81,7 +81,7 @@ const PartySearch: React.FC = () => {
       }
     } catch (error) {
       console.error('Error performing search:', error);
-      setMessage('An error occurred while searching. Please try again.');
+      setMessage('An error occurred while searching. Please try again. (' + error + ')');
       setResults([]);
     } finally {
       setLoading(false);
@@ -95,7 +95,23 @@ const PartySearch: React.FC = () => {
     setSuggestions([]);
     setHighlightedIndex(-1);
     setShouldFetchSuggestions(false);
-    handleSearch(suggestion.name);
+    searchParties({ 
+      query: suggestion.name, 
+      page: 1, 
+      pageSize: pagination.pageSize 
+    })
+      .then(response => {
+        setResults(response.results);
+        setPagination(response.pagination);
+        if (response.results.length === 0) {
+          setMessage(response.message || `No parties found matching '${suggestion.name}'`);
+        }
+      })
+      .catch(error => {
+        console.error('Error performing search:', error);
+        setMessage('An error occurred while searching. Please try again. (' + error + ')');
+        setResults([]);
+      });
   };
 
   // Keyboard navigation for suggestions.
