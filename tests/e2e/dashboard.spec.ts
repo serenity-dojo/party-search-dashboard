@@ -3,13 +3,18 @@ import { test, expect } from './fixtures';
 import { setupPartyApiMock } from '../../features/test-utils/apiMock';
 
 test.describe('Performing a Party Search', () => {
-    test.beforeEach(async ({ dashboardPage }) => {
+
+    test.beforeEach(async ({ page, dashboardPage }) => {
         await dashboardPage.navigate();
-    }
-    );
+    });
 
     test.describe('Viewing the Dashboard Page', () => {
 
+        test.beforeEach(async ({ dashboardPage }) => {       
+            await dashboardPage.navigate();
+        }
+        );
+    
         test('should display the correct title', async ({ dashboardPage }) => {
             const title = await dashboardPage.getTitle();
             expect(title).toBe('Sanctions Dashboard');
@@ -53,8 +58,9 @@ test.describe('Performing a Party Search', () => {
         test.beforeEach(async ({ page, dashboardPage }) => {
             // Set up the mock so that searching for "Acme" returns a couple of records.
             await setupPartyApiMock(page, 'Acme', matchingParties);
+            await dashboardPage.navigate();
         });
-
+    
         test('should display the sanctioned parties when a match is found', async ({ dashboardPage }) => {
 
             await dashboardPage.searchParty('Acme');
@@ -68,7 +74,6 @@ test.describe('Performing a Party Search', () => {
     );
     test.describe('when the Party API returns no results', () => {
         test.beforeEach(async ({ page, dashboardPage }) => {
-            // Set up the mock so that searching for "Acme" returns no records.
             await setupPartyApiMock(page, 'Acme', []);
         });
 

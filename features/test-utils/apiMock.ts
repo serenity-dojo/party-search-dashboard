@@ -41,16 +41,21 @@ export async function setupPartyApiMock(
         responseBody.message = `No parties found matching '${query}'`;
     }
 
-    await page.route('**/api/parties', async (route) => {
+    await page.route('**/api/parties**', async (route) => {
         const url = new URL(route.request().url());
-        if (url.searchParams.get('query') === query) {
+    
+        const actualQuery = url.searchParams.get('query')?.trim().toLowerCase();
+        const expectedQuery = query.trim().toLowerCase();
+    
+        if (actualQuery === expectedQuery) {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify(responseBody),
             });
         } else {
-            await route.continue();
+            console.warn(`🟡 Unmatched query: ${actualQuery} (expected: ${expectedQuery})`);
+            await route.continue(); // let it fall through
         }
     });
 }

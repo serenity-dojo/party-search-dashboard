@@ -25,7 +25,6 @@ export class DashboardPage {
      * Fills in the search input and clicks the search button.
      */
     async searchParty(searchString: string) {
-        await this.page.pause();
         await this.partySearchInput.click();
         await this.partySearchInput.fill(searchString);
         await this.partySearchButton.click();
