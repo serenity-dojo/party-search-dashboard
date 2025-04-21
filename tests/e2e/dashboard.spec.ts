@@ -35,7 +35,6 @@ test.describe('Performing a Party Search', () => {
         );
     });
 
-
     test.describe('when the Party API returns results', () => {
 
         const matchingParties = [
@@ -72,6 +71,7 @@ test.describe('Performing a Party Search', () => {
         );
     }
     );
+
     test.describe('when the Party API returns no results', () => {
         test.beforeEach(async ({ page, dashboardPage }) => {
             await setupPartyApiMock(page, 'Acme', []);
@@ -85,4 +85,48 @@ test.describe('Performing a Party Search', () => {
         );
     }
     );
+
+    test.describe('when the analyst starts to type in the search input', () => {
+        
+        const matchingParties = [
+            {
+                'Party ID': 'P13579246',
+                'Name': 'John Smith',
+                'Type': 'Individual',
+                'Sanctions Status': 'Pending Review',
+                'Match Score': '85%',
+            },
+            {
+                'Party ID': 'P24681357',
+                'Name': 'Smith and Sons',
+                'Type': 'Organization',
+                'Sanctions Status': 'Pending Review',
+                'Match Score': '65%',
+            }
+        ]
+
+        test.beforeEach(async ({ page, dashboardPage }) => {
+            await setupPartyApiMock(page, 'Smi', matchingParties);
+        });
+
+        test('should display no suggestions when two characters are entered', async ({ dashboardPage }) => {
+            await dashboardPage.partySearchInput.fill('Sm');
+            const suggestions = await dashboardPage.getSuggestions();
+            expect(suggestions.length).toBe(0);
+        });
+
+        test('should display suggestions when three characters are entered', async ({ dashboardPage }) => {
+            await dashboardPage.partySearchInput.fill('Smi');
+
+            await dashboardPage.partySuggestions.first().waitFor({ state: 'visible' });
+
+            const suggestions = await dashboardPage.getSuggestions();
+        
+            expect(suggestions).toEqual(expect.arrayContaining([
+                'John Smith',
+                'Smith and Sons'
+            ]));
+        });
+
+    });
 });

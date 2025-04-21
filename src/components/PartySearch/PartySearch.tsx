@@ -182,10 +182,11 @@ const PartySearch: React.FC = () => {
             {suggestions.map((sugg, index) => {
               const isHighlighted = index === highlightedIndex;
               return (
-                <Box 
+                <Box         
                   key={index} 
                   onClick={() => handleSuggestionClick(sugg)}
                   onMouseEnter={() => setHighlightedIndex(index)}
+                  data-testid={`suggestion-${index}`}
                   sx={{ 
                     p: 1, 
                     cursor: 'pointer',
