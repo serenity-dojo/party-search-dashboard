@@ -15,11 +15,14 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start:backend": "cd ../path-to-dotnet-project && dotnet run --seed-data sample-parties.json",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:e2e": "playwright test",
-    "test:cucumber": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js\""
+    "test:ui:component": "playwright test",
+    "test:acceptance:ui": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js tests/cucumber/ui\"",
+    "test:acceptance:e2e": "cross-env start-server-and-test \"npm run start:backend\" http://localhost:5044 \"npm run test:acceptance:e2e:frontend\"",
+    "test:acceptance:e2e:frontend": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js tests/cucumber/e2e\""
   },
   "eslintConfig": {
     "extends": [

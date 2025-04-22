@@ -1,4 +1,5 @@
 // src/testUtils/apiMock.ts
+import { match } from 'assert';
 import { Page } from 'playwright';
 
 export interface PartyRow {
@@ -6,7 +7,7 @@ export interface PartyRow {
     'Name': string;
     'Type': string;
     'Sanctions Status': string;
-    'Match Score': string;
+    'Match Score': number;
 }
 
 /**
@@ -26,7 +27,7 @@ export async function setupPartyApiMock(
         name: row['Name'],
         type: row['Type'],
         sanctionsStatus: row['Sanctions Status'],
-        matchScore: row['Match Score'],
+        matchScore: row['Match Score'],    
     }));
 
     const pagination = {

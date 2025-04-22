@@ -40,3 +40,19 @@ Then('Connie should see a message: {string}', async function (message: string) {
     const actualMessage = await this.dashboardPage.getNoResultsMessage();
     expect(actualMessage).toBe(message);
 });
+
+When('Connie types {string}',async function (s: string) {
+    await this.dashboardPage.partySearchInput.fill(s);
+})
+  
+Then('the following names should be suggested:', async function (expectedSuggestionList) {
+    const expectedNames = expectedSuggestionList.raw().flat(); 
+    const suggestions = await this.dashboardPage.getSuggestions();
+    expect(suggestions).toEqual(expectedNames);
+})
+
+Then('no names should be suggested', async function () {
+    const suggestions = await this.dashboardPage.getSuggestions();
+    expect(suggestions.length).toBe(0);
+})
+

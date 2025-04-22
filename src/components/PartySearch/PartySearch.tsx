@@ -151,6 +151,14 @@ const PartySearch: React.FC = () => {
     });
   };
 
+  // Format matchScore as a percentage
+  const formatMatchScore = (score: number | string) => {
+    if (typeof score === 'number') {
+      return `${(score * 100)}%`;
+    } 
+    return score; // Return as is if not a valid number
+  };
+
   return (
     <Box sx={{ p: 2, position: 'relative' }}>
       <Typography variant="h5" gutterBottom>
@@ -245,7 +253,9 @@ const PartySearch: React.FC = () => {
                 <TableRow key={index}>
                   {columns.map(col => (
                     <TableCell key={col.key}>
-                      {row[col.key as keyof Party]}
+                      {col.key === 'matchScore' 
+                        ? formatMatchScore(row[col.key as keyof Party]) 
+                        : row[col.key as keyof Party]}
                     </TableCell>
                   ))}
                 </TableRow>

@@ -43,6 +43,23 @@ test.describe('Performing a Party Search', () => {
                 'Name': 'Acme Corporation',
                 'Type': 'Organization',
                 'Sanctions Status': 'Approved',
+                'Match Score': 0.95,
+            },
+            {
+                'Party ID': 'P87654321',
+                'Name': 'Acme Inc.',
+                'Type': 'Organization',
+                'Sanctions Status': 'Pending Review',
+                'Match Score': 0.65,
+            },
+        ]
+
+        const displayedParties = [
+            {
+                'Party ID': 'P12345678',
+                'Name': 'Acme Corporation',
+                'Type': 'Organization',
+                'Sanctions Status': 'Approved',
                 'Match Score': '95%',
             },
             {
@@ -66,7 +83,7 @@ test.describe('Performing a Party Search', () => {
 
             const results = await dashboardPage.getSearchResults();
 
-            expect(results).toEqual(matchingParties);
+            expect(results).toEqual(displayedParties);
         }
         );
     }
@@ -94,14 +111,14 @@ test.describe('Performing a Party Search', () => {
                 'Name': 'John Smith',
                 'Type': 'Individual',
                 'Sanctions Status': 'Pending Review',
-                'Match Score': '85%',
+                'Match Score': 0.85,
             },
             {
                 'Party ID': 'P24681357',
                 'Name': 'Smith and Sons',
                 'Type': 'Organization',
                 'Sanctions Status': 'Pending Review',
-                'Match Score': '65%',
+                'Match Score': 0.65,
             }
         ]
 
