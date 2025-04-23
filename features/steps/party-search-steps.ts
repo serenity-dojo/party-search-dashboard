@@ -1,9 +1,23 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import { expect } from '@playwright/test';
 import { setupPartyApiMock, PartyRow } from '../test-utils/apiMock';
+import { request } from '@playwright/test';
+
+const API_BASE_URL = 'http://localhost:5044';
+
+const generatePartyId = () => `P${Date.now()}${Math.floor(Math.random() * 1000)}`;
 
 Given('the Party API returns the following parties for the search query {string}:', async function (query: string, dataTable) {
-    const rows: PartyRow[] = dataTable.hashes();
+    const rows: PartyRow[] = dataTable.hashes().map((row: { [x: string]: string; }) => {
+        return ({
+            'Party ID': row['Party ID'],
+            'Name': row['Name'],
+            'Type': row['Type'],
+            'Sanctions Status': row['Sanctions Status'],
+            'Match Score': parseFloat(row['Match Score']),
+        });
+    });
+
     await setupPartyApiMock(this.page, query, rows);
 });
 
@@ -22,18 +36,17 @@ When('Connie searches for {string}', async function (searchQuery: string) {
     await this.dashboardPage.searchParty(searchQuery);
 });
 
-// "Then the search results should contain exactly:"
 Then('the search results should contain exactly:', async function (dataTable) {
-    // Convert the Gherkin data table into an array of objects
-    const expectedRows = dataTable.hashes();
-
-    // Retrieve the actual results from the UI via your page object
-    const results = await this.dashboardPage.getSearchResults();
-
-    // Use a single deep equality check to confirm they match exactly
-    expect(results).toEqual(expectedRows);
-});
-
+    const expected = dataTable.hashes();
+    const actual = await this.dashboardPage.getSearchResults();
+  
+    expect(actual.map(stripId)).toEqual(expected.map(stripId));
+  });
+  
+  function stripId(row: any) {
+    const { 'Party ID': _, ...rest } = row;
+    return rest;
+  }
 
 // "Then Connie should see a message: {string}"
 Then('Connie should see a message: {string}', async function (message: string) {
@@ -56,3 +69,26 @@ Then('no names should be suggested', async function () {
     expect(suggestions.length).toBe(0);
 })
 
+Given('the following parties exist:', async function (dataTable) {
+    const parties = dataTable.hashes().map(row => ({
+      partyId: generatePartyId(),
+      name: row['Name'],
+      type: row['Type'],
+      sanctionsStatus: row['Sanctions Status'],
+      matchScore: parseFloat(row['Match Score']),
+    }));
+  
+    this.createdPartyIds = [];
+  
+    const apiContext = await request.newContext({ baseURL: 'http://localhost:5000' });
+  
+    for (const party of parties) {
+      const response = await apiContext.post('/api/parties', { data: party });
+      if (![200, 201].includes(response.status())) {
+        throw new Error(`Failed to create party: ${party.name}`);
+      }
+      this.createdPartyIds.push(party.partyId);
+    }
+  
+    await apiContext.dispose();
+  });

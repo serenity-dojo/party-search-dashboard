@@ -19,7 +19,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "test:ui:component": "playwright test",
+    "test:component:ui": "playwright test",
     "test:acceptance:ui": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js tests/cucumber/ui\"",
     "test:acceptance:e2e": "cross-env start-server-and-test \"npm run start:backend\" http://localhost:5044 \"npm run test:acceptance:e2e:frontend\"",
     "test:acceptance:e2e:frontend": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js tests/cucumber/e2e\""

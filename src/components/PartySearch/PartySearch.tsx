@@ -156,7 +156,7 @@ const PartySearch: React.FC = () => {
     if (typeof score === 'number') {
       return `${(score * 100)}%`;
     } 
-    return score; // Return as is if not a valid number
+    return score; // If it's already a string, return it as is.
   };
 
   return (
