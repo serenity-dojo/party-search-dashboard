@@ -15,6 +15,7 @@ import {
   CircularProgress,
   Pagination
 } from '@mui/material';
+import { formatMatchScore, formatSanctionsStatus } from '../../utils/formatters'; 
 import { searchParties, Party, Pagination as PaginationData } from '../../services/partyApiService';
 
 const PartySearch: React.FC = () => {
@@ -151,14 +152,6 @@ const PartySearch: React.FC = () => {
     });
   };
 
-  // Format matchScore as a percentage
-  const formatMatchScore = (score: number | string) => {
-    if (typeof score === 'number') {
-      return `${(score * 100)}%`;
-    } 
-    return score; // If it's already a string, return it as is.
-  };
-
   return (
     <Box sx={{ p: 2, position: 'relative' }}>
       <Typography variant="h5" gutterBottom>
@@ -253,9 +246,11 @@ const PartySearch: React.FC = () => {
                 <TableRow key={index}>
                   {columns.map(col => (
                     <TableCell key={col.key}>
-                      {col.key === 'matchScore' 
-                        ? formatMatchScore(row[col.key as keyof Party]) 
-                        : row[col.key as keyof Party]}
+                      {col.key === 'matchScore'
+                        ? formatMatchScore(row[col.key as keyof Party])
+                        : col.key === 'sanctionsStatus'
+                          ? formatSanctionsStatus(row[col.key as keyof Party] as string)
+                          : row[col.key as keyof Party]}
                     </TableCell>
                   ))}
                 </TableRow>

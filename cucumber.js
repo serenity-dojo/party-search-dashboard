@@ -1,6 +1,5 @@
 module.exports = {
     default: {
-        paths: ['features/**/*.feature'],
         require: [
             'ts-node/register/transpile-only',
             'tsconfig-paths/register',

@@ -12,6 +12,7 @@ const config: PlaywrightTestConfig = {
         headless: true,
         actionTimeout: 0,
         baseURL: 'http://localhost:3000',
+        ignoreHTTPSErrors: true,
         trace: 'on-first-retry',
     },
     projects: [

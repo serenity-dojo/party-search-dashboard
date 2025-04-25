@@ -38,8 +38,7 @@ When('Connie searches for {string}', async function (searchQuery: string) {
 
 Then('the search results should contain exactly:', async function (dataTable) {
     const expected = dataTable.hashes();
-    const actual = await this.dashboardPage.getSearchResults();
-  
+    const actual = await this.dashboardPage.getSearchResults();  
     expect(actual.map(stripId)).toEqual(expected.map(stripId));
   });
   
@@ -70,25 +69,33 @@ Then('no names should be suggested', async function () {
 })
 
 Given('the following parties exist:', async function (dataTable) {
-    const parties = dataTable.hashes().map(row => ({
-      partyId: generatePartyId(),
-      name: row['Name'],
-      type: row['Type'],
-      sanctionsStatus: row['Sanctions Status'],
-      matchScore: parseFloat(row['Match Score']),
-    }));
+    const parties = dataTable.hashes().map((row: { [x: string]: string; }) => ({
+          name: row['Name'],
+          type: row['Type'],
+          sanctionsStatus: row['Sanctions Status'].replace(/\s/g, ''), // remove space
+          matchScore: parseFloat(row['Match Score']),
+      }));
+      this.createdPartyIds = [];
   
-    this.createdPartyIds = [];
+    const apiContext = await request.newContext({
+      baseURL: 'https://localhost:7044',
+      ignoreHTTPSErrors: true
+    });
   
-    const apiContext = await request.newContext({ baseURL: 'http://localhost:5000' });
-  
-    for (const party of parties) {
-      const response = await apiContext.post('/api/parties', { data: party });
-      if (![200, 201].includes(response.status())) {
-        throw new Error(`Failed to create party: ${party.name}`);
-      }
-      this.createdPartyIds.push(party.partyId);
+    for (const wrapper of parties) {
+        const response = await apiContext.post('/api/parties', { data: wrapper });
+      
+        if (![200, 201].includes(response.status())) {
+          const body = await response.text();
+          throw new Error(`Failed to create party: ${JSON.stringify(wrapper)}. Status: ${response.status()}. Body: ${body}`);
+        }
+      
+        const responseBody = await response.json();
+        if (responseBody.partyId) {
+          this.createdPartyIds.push(responseBody.partyId);
+        }
     }
-  
+    
     await apiContext.dispose();
   });
+  

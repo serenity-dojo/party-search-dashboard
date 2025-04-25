@@ -13,17 +13,28 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+  
   "scripts": {
     "start": "react-scripts start",
-    "start:backend": "cd ../path-to-dotnet-project && dotnet run --seed-data sample-parties.json",
     "build": "react-scripts build",
-    "test": "react-scripts test",
     "eject": "react-scripts eject",
+
+    "start:backend": "cd ../../API/PartySearch/PartySearchApi.Api && dotnet run",
+
+    "start:servers": "concurrently -k -n backend,frontend \"npm run start:backend\" \"npm start\"",
+    "wait:servers": "wait-on tcp:5044 tcp:3000",
+
+    "test": "react-scripts test",
+    "test:unit": "react-scripts test",
     "test:component:ui": "playwright test",
-    "test:acceptance:ui": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js tests/cucumber/ui\"",
-    "test:acceptance:e2e": "cross-env start-server-and-test \"npm run start:backend\" http://localhost:5044 \"npm run test:acceptance:e2e:frontend\"",
-    "test:acceptance:e2e:frontend": "cross-env start-server-and-test \"npm start\" http://localhost:3000 \"cucumber-js tests/cucumber/e2e\""
+
+    "test:acceptance:ui": "start-server-and-test start http://localhost:3000 \"cucumber-js features/ui/**/*.feature --require features\"",
+    "test:acceptance:e2e": "start-server-and-test start:servers http://localhost:3000 \"npm run test:acceptance:e2e:run\"",
+    "test:acceptance:e2e:run": "wait-on tcp:5044 && cucumber-js features/e2e/**/*.feature --require features",
+    "test:acceptance:all": "start-server-and-test start:servers http://localhost:3000 \"npm run test:acceptance:all:run\"",
+    "test:acceptance:all:run": "wait-on tcp:5044 && cucumber-js features/**/*.feature --require features"
   },
+
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -54,6 +65,7 @@
     "@types/node": "^18.11.18",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "concurrently": "^9.1.2",
     "cross-env": "^7.0.3",
     "jest": "^27.5.1",
     "start-server-and-test": "^2.0.11",
