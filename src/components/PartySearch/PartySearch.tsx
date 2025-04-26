@@ -43,7 +43,15 @@ const PartySearch: React.FC = () => {
 
   // Fetch suggestions if the query is at least 3 characters and we want to fetch suggestions.
   useEffect(() => {
-    if (query.trim().length >= 3 && shouldFetchSuggestions) {
+    const trimmedQuery = query.trim();
+    const isPartyId = /^P\d+$/i.test(trimmedQuery); // case-insensitive match
+
+    const isValidForSuggestion = (
+      (isPartyId && trimmedQuery.length >= 5) ||
+      (!isPartyId && trimmedQuery.length >= 3)
+    );
+
+    if (isValidForSuggestion && shouldFetchSuggestions) {
       const timeoutId = setTimeout(() => {
         searchParties({ query, page: 1, pageSize: 10 })
           .then(response => setSuggestions(response.results))
