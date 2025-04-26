@@ -86,5 +86,5 @@ Feature: Search for a party by name or ID
         | P12344329 | Smith Johnson | Individual | Escalated        |         0.80 |
       When Connie types "P1234"
       Then the following names should be suggested:
-        |John Smith |
+        | John Smith |
         | Smith Johnson |
