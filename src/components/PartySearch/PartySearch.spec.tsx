@@ -70,21 +70,4 @@ describe('PartySearch component suggestion behavior', () => {
         );
       });
   });
-
-  it('should NOT fetch suggestions when user types "P123" (party ID too short)', () => {
-    const searchPartiesMock = searchParties as jest.MockedFunction<typeof searchParties>;
-    searchPartiesMock.mockResolvedValueOnce(Promise.resolve({
-        results: [],
-        pagination: { currentPage: 1, pageSize: 10, totalPages: 0, totalResults: 0 }
-      }));
-
-    render(<PartySearch />);
-    const input = screen.getByTestId('party-search-input');
-
-    fireEvent.change(input, { target: { value: 'P123' } });
-    jest.advanceTimersByTime(300);
-
-    expect(searchPartiesMock).not.toHaveBeenCalled();
-  });
-
 });

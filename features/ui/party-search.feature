@@ -70,15 +70,6 @@ Feature: Search for a party by name or ID
       Then no names should be suggested
 
     @UI
-    Example: No auto-suggestions for party ID with fewer than 5 characters
-      Given the Party API returns the following parties for the search query "P123":
-        | Party ID  | Name          | Type       | Sanctions Status | Match Score |
-        | P12345678 | John Smith    | Individual | Approved         |         0.90 |
-        | P87654329 | Smith Johnson | Individual | Escalated        |         0.80 |
-      When Connie types "P123"
-      Then no names should be suggested
-      
-    @UI
     Example: Should propose auto-suggestions for party ID with 5 characters or more
       Given the Party API returns the following parties for the search query "P1234":
         | Party ID  | Name          | Type       | Sanctions Status | Match Score  |
