@@ -51,7 +51,7 @@ describe('PartySearch component suggestion behavior', () => {
     expect(searchPartiesMock).not.toHaveBeenCalled();
   });
 
-  it('should fetch suggestions when user types "P1234" (party ID with enough chars)', async () => {
+  it('should fetch suggestions when user types "P1234" (partial party ID)', async () => {
     const searchPartiesMock = searchParties as jest.MockedFunction<typeof searchParties>;
     searchPartiesMock.mockResolvedValueOnce({
       results: [],
