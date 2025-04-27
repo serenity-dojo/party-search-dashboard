@@ -83,3 +83,4 @@ Feature: Search for a party by name or ID
       Then the following names should be suggested:
         | John Smith |
         | Smith Johnson |
+

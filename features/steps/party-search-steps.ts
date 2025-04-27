@@ -36,6 +36,10 @@ When('Connie searches for {string}', async function (searchQuery: string) {
     await this.dashboardPage.searchParty(searchQuery);
 });
 
+When('Connie filters by sanction status {string}', async function (status: string) {
+    await this.dashboardPage.selectSanctionsStatus(status);
+});
+  
 Then('the search results should contain exactly:', async function (dataTable) {
     const expected = dataTable.hashes();
     const actual = await this.dashboardPage.getSearchResults();  
@@ -99,4 +103,3 @@ Given('the following parties exist:', async function (dataTable) {
     
     await apiContext.dispose();
   });
-  
