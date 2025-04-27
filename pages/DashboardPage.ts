@@ -20,7 +20,7 @@ export class DashboardPage {
 
     async navigate() {
         // Sometimes the application may take a while to start, so we wait for the page to load.
-        await this.page.goto('http://localhost:3000', { timeout: 20000, waitUntil: 'domcontentloaded' });
+        await this.page.goto('http://localhost:3000', { timeout: 30000 });
     }
 
     /**
