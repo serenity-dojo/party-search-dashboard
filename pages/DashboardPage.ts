@@ -32,20 +32,30 @@ export class DashboardPage {
         await this.partySearchButton.click();
     }
 
-    async getSuggestions(): Promise<string[]> {
-        try {
-            // Wait for at least one suggestion to become visible
-            await this.partySuggestions.first().waitFor({ state: 'visible', timeout: 500 });
+    async waitForSuggestions() {
+        await this.page.waitForSelector('[data-testid^="suggestion-"]', { timeout: 3000 });
+      }
+      
+      async getSuggestions(): Promise<string[]> {
+        const suggestionElements = await this.page.locator('[data-testid^="suggestion-"]').all();
+        const suggestions = await Promise.all(suggestionElements.map(el => el.innerText()));
+        return suggestions.map(text => text.trim());
+      }
+      
+    // async getSuggestions(): Promise<string[]> {
+    //     try {
+    //         // Wait for at least one suggestion to become visible
+    //         await this.partySuggestions.first().waitFor({ state: 'visible', timeout: 500 });
     
-            // Get and return the trimmed text content of all suggestion elements
-            return await this.partySuggestions.evaluateAll((elements) =>
-                elements.map((el) => el.textContent?.trim() || '')
-            );
-        } catch {
-            // If no suggestions appear in time, return an empty list
-            return [];
-        }
-    }
+    //         // Get and return the trimmed text content of all suggestion elements
+    //         return await this.partySuggestions.evaluateAll((elements) =>
+    //             elements.map((el) => el.textContent?.trim() || '')
+    //         );
+    //     } catch {
+    //         // If no suggestions appear in time, return an empty list
+    //         return [];
+    //     }
+    // }
 
     getTitle(): Promise<string> {
         return this.page.title();

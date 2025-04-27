@@ -59,6 +59,7 @@ When('Connie types {string}',async function (s: string) {
   
 Then('the following names should be suggested:', async function (expectedSuggestionList) {
     const expectedNames = expectedSuggestionList.raw().flat(); 
+    await this.dashboardPage.waitForSuggestions(); 
     const suggestions = await this.dashboardPage.getSuggestions();
     expect(suggestions).toEqual(expectedNames);
 })
