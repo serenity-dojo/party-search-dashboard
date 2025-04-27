@@ -10,6 +10,7 @@ export class DashboardPage {
     readonly noResultsMessage: Locator;
     readonly partySuggestions: Locator;
     readonly clearSearchButton: Locator;
+    readonly sanctionsStatusFilter: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -19,6 +20,7 @@ export class DashboardPage {
         this.noResultsMessage = page.locator('[data-testid=no-results-message]');
         this.partySuggestions = page.locator('[data-testid^=suggestion-]');
         this.clearSearchButton = page.locator('[data-testid=clear-search-button]');
+        this.sanctionsStatusFilter = page.locator('[data-testid=sanctions-status-filter]');
     }
 
     async navigate() {
@@ -104,4 +106,10 @@ export class DashboardPage {
     async getNoResultsMessage(): Promise<string | null> {
         return this.noResultsMessage.textContent();
     }
+
+    async selectSanctionsStatus(status: string): Promise<void> {
+        await this.sanctionsStatusFilter.click();
+        await this.page.getByRole('option', { name: status }).click();
+    }
+    
 }

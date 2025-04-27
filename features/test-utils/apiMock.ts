@@ -1,5 +1,4 @@
 // src/testUtils/apiMock.ts
-import { match } from 'assert';
 import { Page } from 'playwright';
 
 export interface PartyRow {
@@ -11,23 +10,25 @@ export interface PartyRow {
 }
 
 /**
- * Sets up the Party API mock for the given query.
+ * Sets up the Party API mock for the given query (and optional sanctionsStatus filter).
  * 
  * @param page - The Playwright Page instance.
  * @param query - The search query to match.
  * @param dataRows - Array of objects representing party rows (from a Cucumber data table, for example).
+ * @param sanctionsStatus - Optional Sanctions Status filter to match.
  */
 export async function setupPartyApiMock(
     page: Page,
     query: string,
-    dataRows: PartyRow[]
+    dataRows: PartyRow[],
+    sanctionsStatus?: string
 ): Promise<void> {
     const results = dataRows.map(row => ({
         partyId: row['Party ID'],
         name: row['Name'],
         type: row['Type'],
         sanctionsStatus: row['Sanctions Status'],
-        matchScore: row['Match Score'],    
+        matchScore: row['Match Score'],
     }));
 
     const pagination = {
@@ -45,18 +46,22 @@ export async function setupPartyApiMock(
     await page.route('**/api/parties**', async (route) => {
         const url = new URL(route.request().url());
     
-        const actualQuery = url.searchParams.get('query')?.trim().toLowerCase();
+        const actualQuery = url.searchParams.get('query')?.trim().toLowerCase() || '';
         const expectedQuery = query.trim().toLowerCase();
     
-        if (actualQuery === expectedQuery) {
+        const actualSanctionsStatus = url.searchParams.get('sanctionsStatus') || 'All';
+        const expectedSanctionsStatus = sanctionsStatus || 'All';
+
+        if (actualQuery === expectedQuery 
+            && (expectedSanctionsStatus === 'All' || actualSanctionsStatus === expectedSanctionsStatus)) {
             await route.fulfill({
                 status: 200,
                 contentType: 'application/json',
                 body: JSON.stringify(responseBody),
             });
         } else {
-            console.warn(`🟡 Unmatched query: ${actualQuery} (expected: ${expectedQuery})`);
             await route.continue(); // let it fall through
         }
     });
+    
 }

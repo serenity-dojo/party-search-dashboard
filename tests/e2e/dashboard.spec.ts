@@ -163,4 +163,124 @@ test.describe('Performing a Party Search', () => {
         });
 
     });
+
+    test.describe('Filtering search results by Sanctions Status', () => {
+  
+        const allParties = [
+          {
+            'Party ID': 'P111',
+            'Name': 'Alpha Corp',
+            'Type': 'Organization',
+            'Sanctions Status': 'Approved',
+            'Match Score': 0.95,
+          },
+          {
+            'Party ID': 'P222',
+            'Name': 'Beta LLC',
+            'Type': 'Organization',
+            'Sanctions Status': 'Pending Review',
+            'Match Score': 0.65,
+          },
+          {
+            'Party ID': 'P333',
+            'Name': 'Gamma Ltd',
+            'Type': 'Organization',
+            'Sanctions Status': 'Escalated',
+            'Match Score': 0.85,
+          }
+        ];
+      
+        const approvedParties = [
+          {
+            'Party ID': 'P111',
+            'Name': 'Alpha Corp',
+            'Type': 'Organization',
+            'Sanctions Status': 'Approved',
+            'Match Score': 0.95,
+          }
+        ];
+      
+        const escalatedParties = [
+          {
+            'Party ID': 'P333',
+            'Name': 'Gamma Ltd',
+            'Type': 'Organization',
+            'Sanctions Status': 'Escalated',
+            'Match Score': 0.85,
+          }
+        ];
+      
+        test.beforeEach(async ({ page, dashboardPage }) => {
+          await setupPartyApiMock(page, 'Acme', allParties); // Mock for initial "All" search
+          await dashboardPage.navigate();
+          await dashboardPage.searchParty('Acme');
+        });
+      
+        test('should display all parties initially', async ({ dashboardPage }) => {
+          const results = await dashboardPage.getSearchResults();
+          expect(results.length).toBe(3);
+        });
+      
+        test('should filter results by Approved status', async ({ page, dashboardPage }) => {
+            await setupPartyApiMock(page, 'Acme', approvedParties, 'Approved');
+      
+          await Promise.all([
+            page.waitForResponse(response => 
+              response.url().includes('/api/parties') &&
+              response.url().includes('sanctionsStatus=Approved')
+            ),
+            dashboardPage.selectSanctionsStatus('Approved')
+          ]);
+      
+          const results = await dashboardPage.getSearchResults();
+          expect(results).toEqual([
+            expect.objectContaining({ 'Sanctions Status': 'Approved' })
+          ]);
+        });
+      
+        test('should filter results by Escalated status', async ({ page, dashboardPage }) => {
+          await setupPartyApiMock(page, 'Acme', escalatedParties, 'Escalated');
+      
+          await Promise.all([
+            page.waitForResponse(response => 
+              response.url().includes('/api/parties') &&
+              response.url().includes('sanctionsStatus=Escalated')
+            ),
+            dashboardPage.selectSanctionsStatus('Escalated')
+          ]);
+      
+          const results = await dashboardPage.getSearchResults();
+          expect(results).toEqual([
+            expect.objectContaining({ 'Sanctions Status': 'Escalated' })
+          ]);
+        });
+      
+        test('should show all parties again when All is selected', async ({ page, dashboardPage }) => {
+          await setupPartyApiMock(page, 'Acme', escalatedParties, 'Escalated');
+      
+          // First apply "Escalated" filter
+          await Promise.all([
+            page.waitForResponse(response => 
+              response.url().includes('/api/parties') &&
+              response.url().includes('sanctionsStatus=Escalated')
+            ),
+            dashboardPage.selectSanctionsStatus('Escalated')
+          ]);
+      
+          // Now setup and select "All" again
+          await setupPartyApiMock(page, 'Acme', allParties);
+      
+          await Promise.all([
+            page.waitForResponse(response => 
+              response.url().includes('/api/parties') && 
+              !response.url().includes('sanctionsStatus=') // "All" means no filter param or empty
+            ),
+            dashboardPage.selectSanctionsStatus('All')
+          ]);
+      
+          const results = await dashboardPage.getSearchResults();
+          expect(results.length).toBe(3);
+        });
+      });
+          
 });

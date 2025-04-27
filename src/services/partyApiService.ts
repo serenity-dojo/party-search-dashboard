@@ -16,6 +16,7 @@ export interface PartySearchParams {
     page?: number;
     pageSize?: number;
     sortBy?: string;
+    sanctionsStatus?: string;
     sortDirection?: 'asc' | 'desc';
 }
 
@@ -35,33 +36,34 @@ export interface PartySearchResponse {
 /**
  * Search for parties by name or ID
  */
-export const searchParties = async (params: PartySearchParams): Promise<PartySearchResponse> => {
-    try {
-        console.log('Search Parties Query:', params.query);
-
-        const response = await axios.get(`${API_BASE_URL}/parties`, {
-            params: {
-                query: params.query,
-                page: params.page || 1,
-                pageSize: params.pageSize || 10,
-                sortBy: params.sortBy,
-                sortDirection: params.sortDirection,
-            },
-        });
-        console.log('API response:', response.data);
-        return response.data;
-    } catch (error) {
-        // Log the error and return an empty result set with a message
-        console.error('Error searching for parties:', error);
-        return {
-            results: [],
-            pagination: {
-                currentPage: params.page || 1,
-                pageSize: params.pageSize || 10,
-                totalPages: 0,
-                totalResults: 0,
-            },
-            message: `No parties found matching '${params.query}'`,
-        };
+// src/services/partyApiService.ts
+export async function searchParties(params: {
+    query: string;
+    page: number;
+    pageSize: number;
+    sanctionsStatus?: string;
+  }) {
+    const { query, page, pageSize, sanctionsStatus } = params;
+  
+    // Create a real URL object (handles query params safely)
+    const url = new URL('/api/parties', window.location.origin);
+  
+    url.searchParams.append('query', query);
+    url.searchParams.append('page', page.toString());
+    url.searchParams.append('pageSize', pageSize.toString());
+  
+    // Only add sanctionsStatus if it is set and not 'All'
+    if (sanctionsStatus && sanctionsStatus !== 'All') {
+      url.searchParams.append('sanctionsStatus', sanctionsStatus);
     }
-};
+  
+    const response = await fetch(url.toString());
+  
+    if (!response.ok) {
+      throw new Error('Failed to fetch parties');
+    }
+  
+    return response.json();
+  }
+  
+  
