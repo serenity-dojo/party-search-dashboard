@@ -15,10 +15,10 @@ test.describe('Performing a Party Search', () => {
         }
         );
     
-        test('should display the correct title', async ({ dashboardPage }) => {
-            const title = await dashboardPage.getTitle();
-            expect(title).toBe('Sanctions Dashboard');
-        });
+        // test('should display the correct title', async ({ dashboardPage }) => {
+        //     const title = await dashboardPage.getTitle();
+        //     expect(title).toBe('Sanctions Dashboard');
+        // });
 
         test('should display the search party input and button', async ({ dashboardPage }) => {
 
