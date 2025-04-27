@@ -9,6 +9,7 @@ export class DashboardPage {
     readonly searchResultsTable: Locator;
     readonly noResultsMessage: Locator;
     readonly partySuggestions: Locator;
+    readonly clearSearchButton: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -16,7 +17,9 @@ export class DashboardPage {
         this.partySearchButton = page.locator('[data-testid=party-search-button]');
         this.searchResultsTable = page.locator('[data-testid=search-results-table]');
         this.noResultsMessage = page.locator('[data-testid=no-results-message]');
-        this.partySuggestions = page.locator('[data-testid^=suggestion-]');}
+        this.partySuggestions = page.locator('[data-testid^=suggestion-]');
+        this.clearSearchButton = page.locator('[data-testid=clear-search-button]');
+    }
 
     async navigate() {
         // Sometimes the application may take a while to start, so we wait for the page to load.
@@ -34,37 +37,30 @@ export class DashboardPage {
 
     async waitForSuggestions() {
         await this.page.waitForSelector('[data-testid^="suggestion-"]', { timeout: 3000 });
-      }
-      
-      async getSuggestions(): Promise<string[]> {
+    }
+
+    async getSuggestions(): Promise<string[]> {
         const suggestionElements = await this.page.locator('[data-testid^="suggestion-"]').all();
         const suggestions = await Promise.all(suggestionElements.map(el => el.innerText()));
         return suggestions.map(text => text.trim());
-      }
-      
-    // async getSuggestions(): Promise<string[]> {
-    //     try {
-    //         // Wait for at least one suggestion to become visible
-    //         await this.partySuggestions.first().waitFor({ state: 'visible', timeout: 500 });
-    
-    //         // Get and return the trimmed text content of all suggestion elements
-    //         return await this.partySuggestions.evaluateAll((elements) =>
-    //             elements.map((el) => el.textContent?.trim() || '')
-    //         );
-    //     } catch {
-    //         // If no suggestions appear in time, return an empty list
-    //         return [];
-    //     }
-    // }
+    }
+
 
     getTitle(): Promise<string> {
         return this.page.title();
     }
 
+
     /**
-     * Returns the text of each cell in the results table as a 2D array,
-     * where each sub-array is one row of cells.
+     * Returns the number of rows in the search results table, or 0 if the table is not visible.
      */
+    async getSearchResultsCount(): Promise<number> {
+        if (await this.searchResultsTable.isVisible({ timeout: 500 })) {
+            return await this.searchResultsTable.locator('tbody tr').count();
+        }
+        return 0;
+    }
+
     async getSearchResults(): Promise<Array<Record<string, string>>> {
         // Wait for at least one row to appear (or handle the case of no results).
         await this.searchResultsTable.locator('tbody tr').first().waitFor({ state: 'visible' }).catch(() => { /* handle no rows */ });

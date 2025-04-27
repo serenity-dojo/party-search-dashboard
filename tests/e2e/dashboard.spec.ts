@@ -9,11 +9,6 @@ test.describe('Performing a Party Search', () => {
     });
 
     test.describe('Viewing the Dashboard Page', () => {
-
-        test.beforeEach(async ({ dashboardPage }) => {       
-            await dashboardPage.navigate();
-        }
-        );
     
         test('should display the correct title', async ({ dashboardPage }) => {
             const title = await dashboardPage.getTitle();
@@ -86,6 +81,28 @@ test.describe('Performing a Party Search', () => {
             expect(results).toEqual(displayedParties);
         }
         );
+
+
+        test.describe('Clearing the search input and results', () => {
+
+            test('should clear the input and search results when Clear button is clicked', async ({ dashboardPage }) => {
+                await dashboardPage.partySearchInput.fill('Acme');
+                await dashboardPage.partySearchButton.click();
+        
+                // Simulate results
+                const resultsBeforeClear = await dashboardPage.getSearchResults();
+                expect(resultsBeforeClear.length).toBeGreaterThan(0);
+        
+                await dashboardPage.clearSearchButton.click();
+        
+                // After clicking Clear:
+                await expect(dashboardPage.partySearchInput).toHaveValue('');
+                expect(await dashboardPage.getSearchResultsCount()).toBe(0);
+
+            });
+        
+        });  
+
     }
     );
 

@@ -1,21 +1,21 @@
 // src/components/PartySearch.tsx
 import React, { useState, useEffect } from 'react';
-import { 
-  Box, 
-  Typography, 
-  TextField, 
-  Button, 
-  TableContainer, 
-  Table, 
-  TableHead, 
-  TableBody, 
-  TableRow, 
+import {
+  Box,
+  Typography,
+  TextField,
+  Button,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
   TableCell,
   Paper,
   CircularProgress,
   Pagination
 } from '@mui/material';
-import { formatMatchScore, formatSanctionsStatus } from '../../utils/formatters'; 
+import { formatMatchScore, formatSanctionsStatus } from '../../utils/formatters';
 import { searchParties, Party, Pagination as PaginationData } from '../../services/partyApiService';
 
 const PartySearch: React.FC = () => {
@@ -66,19 +66,19 @@ const PartySearch: React.FC = () => {
   const handleSearch = async (searchQuery?: string, overridePage?: number) => {
     const effectiveQuery = searchQuery ?? query;
     if (!effectiveQuery.trim()) return;
-    
+
     setLoading(true);
     setMessage(undefined);
     try {
-      const response = await searchParties({ 
-        query: effectiveQuery, 
+      const response = await searchParties({
+        query: effectiveQuery,
         page: overridePage ?? pagination.currentPage,
-        pageSize: pagination.pageSize 
+        pageSize: pagination.pageSize
       });
-      
+
       setResults(response.results);
       setPagination(response.pagination);
-      
+
       if (response.results.length === 0) {
         setMessage(response.message || `No parties found matching '${effectiveQuery}'`);
       }
@@ -90,7 +90,7 @@ const PartySearch: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
 
   // When a suggestion is selected (by click or pressing Enter), update the query,
   // clear the suggestions, disable further suggestion fetching, and perform a search.
@@ -144,95 +144,113 @@ const PartySearch: React.FC = () => {
     const newPagination = { ...pagination, currentPage: page };
     setPagination(newPagination);
     // Re-fetch with the new page.
-    searchParties({ 
-      query, 
-      page, 
-      pageSize: pagination.pageSize 
+    searchParties({
+      query,
+      page,
+      pageSize: pagination.pageSize
     }).then(response => {
       setResults(response.results);
       setPagination(response.pagination);
     });
   };
 
+  const handleClear = () => {
+    setQuery('');
+    setResults([]);
+    setMessage(undefined);
+  };
+
+
   return (
     <Box sx={{ p: 2, position: 'relative' }}>
       <Typography variant="h5" gutterBottom>
         Party Search
       </Typography>
-      
+
       {/* Search input with suggestion dropdown */}
-      <Box sx={{ position: 'relative', mb: 2 }}>
-        <TextField
-          label="Enter party name or ID"
-          value={query}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
-          inputProps={{ 'data-testid': 'party-search-input' }}
-          fullWidth
-        />
-        {suggestions.length > 0 && (
-          <Paper 
-            sx={{ 
-              position: 'absolute', 
-              top: '100%', 
-              left: 0, 
-              right: 0, 
-              zIndex: 10, 
-              maxHeight: 300, 
-              overflowY: 'auto'
-            }}
-          >
-            {suggestions.map((sugg, index) => {
-              const isHighlighted = index === highlightedIndex;
-              return (
-                <Box         
-                  key={index} 
-                  onClick={() => handleSuggestionClick(sugg)}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  data-testid={`suggestion-${index}`}
-                  sx={{ 
-                    p: 1, 
-                    cursor: 'pointer',
-                    backgroundColor: isHighlighted ? 'grey.200' : 'transparent'
-                  }}
-                >
-                  {sugg.name}
-                </Box>
-              );
-            })}
-          </Paper>
+      <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-start', mb: 2 }}>
+        <Box sx={{ position: 'relative', mb: 2 }}>
+          <TextField
+            label="Enter party name or ID"
+            value={query}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            inputProps={{ 'data-testid': 'party-search-input' }}
+            fullWidth
+          />
+          {suggestions.length > 0 && (
+            <Paper
+              sx={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                zIndex: 10,
+                maxHeight: 300,
+                overflowY: 'auto'
+              }}
+            >
+              {suggestions.map((sugg, index) => {
+                const isHighlighted = index === highlightedIndex;
+                return (
+                  <Box
+                    key={index}
+                    onClick={() => handleSuggestionClick(sugg)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    data-testid={`suggestion-${index}`}
+                    sx={{
+                      p: 1,
+                      cursor: 'pointer',
+                      backgroundColor: isHighlighted ? 'grey.200' : 'transparent'
+                    }}
+                  >
+                    {sugg.name}
+                  </Box>
+                );
+              })}
+            </Paper>
+          )}
+        </Box>
+
+        <Button
+          variant="contained"
+          onClick={() => {
+            setSuggestions([]);
+            handleSearch();
+          }}
+          data-testid="party-search-button"
+          disabled={loading || !query.trim()}
+        >
+          {loading ? <CircularProgress size={24} /> : 'Search'}
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={handleClear}
+          data-testid="clear-search-button"
+          disabled={query.trim() === ''}
+        >
+          Clear
+        </Button>
+
+
+        {loading && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
+            <CircularProgress />
+          </Box>
         )}
       </Box>
-      
-      <Button
-        variant="contained"
-        onClick={() => {
-          setSuggestions([]);
-          handleSearch();
-        }}
-        data-testid="party-search-button"
-        disabled={loading || !query.trim()}
-      >
-        {loading ? <CircularProgress size={24} /> : 'Search'}
-      </Button>
-      
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', my: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
-      
       {message && !loading && (
-        <Typography 
-          variant="body1" 
-          color="error" 
+        <Typography
+          variant="body1"
+          color="error"
           data-testid="no-results-message"
           sx={{ mt: 2 }}
         >
           {message}
         </Typography>
       )}
-      
+
       {results.length > 0 && !loading && (
         <TableContainer component={Paper} sx={{ mt: 2 }}>
           <Table data-testid="search-results-table">
@@ -259,11 +277,11 @@ const PartySearch: React.FC = () => {
               ))}
             </TableBody>
           </Table>
-          
+
           {pagination.totalPages > 1 && (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
-              <Pagination 
-                count={pagination.totalPages} 
+              <Pagination
+                count={pagination.totalPages}
                 page={pagination.currentPage}
                 onChange={handlePageChange}
                 data-testid="search-results-pagination"
