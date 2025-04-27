@@ -19,7 +19,8 @@ export class DashboardPage {
         this.partySuggestions = page.locator('[data-testid^=suggestion-]');}
 
     async navigate() {
-        await this.page.goto('http://localhost:3000', { timeout: 10000, waitUntil: 'domcontentloaded' });
+        // Sometimes the application may take a while to start, so we wait for the page to load.
+        await this.page.goto('http://localhost:3000', { timeout: 20000, waitUntil: 'domcontentloaded' });
     }
 
     /**
