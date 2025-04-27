@@ -1,69 +1,34 @@
-// src/services/partyApiService.ts
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5044/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://localhost:7044/api'; // Default for local dev
 
-export interface Party {
-    partyId: string;
-    name: string;
-    type: string;
-    sanctionsStatus: string;
-    matchScore: string;
-}
-
-export interface PartySearchParams {
-    query: string;
-    page?: number;
-    pageSize?: number;
-    sortBy?: string;
-    sanctionsStatus?: string;
-    sortDirection?: 'asc' | 'desc';
-}
-
-export interface Pagination {
-    currentPage: number;
-    pageSize: number;
-    totalPages: number;
-    totalResults: number;
-}
-
-export interface PartySearchResponse {
-    results: Party[];
-    pagination: Pagination;
-    message?: string;
-}
-
-/**
- * Search for parties by name or ID
- */
-// src/services/partyApiService.ts
 export async function searchParties(params: {
-    query: string;
-    page: number;
-    pageSize: number;
-    sanctionsStatus?: string;
-  }) {
-    const { query, page, pageSize, sanctionsStatus } = params;
-  
-    // Create a real URL object (handles query params safely)
-    const url = new URL('/api/parties', window.location.origin);
-  
-    url.searchParams.append('query', query);
-    url.searchParams.append('page', page.toString());
-    url.searchParams.append('pageSize', pageSize.toString());
-  
-    // Only add sanctionsStatus if it is set and not 'All'
-    if (sanctionsStatus && sanctionsStatus !== 'All') {
-      url.searchParams.append('sanctionsStatus', sanctionsStatus);
-    }
-  
-    const response = await fetch(url.toString());
-  
-    if (!response.ok) {
-      throw new Error('Failed to fetch parties');
-    }
-  
-    return response.json();
+  query: string;
+  page: number;
+  pageSize: number;
+  sanctionsStatus?: string;
+}) {
+  const { query, page, pageSize, sanctionsStatus } = params;
+
+  const url = new URL(`${API_BASE_URL}/parties`); 
+
+  url.searchParams.append('query', query);
+  url.searchParams.append('page', page.toString());
+  url.searchParams.append('pageSize', pageSize.toString());
+
+  if (sanctionsStatus && sanctionsStatus !== 'All') {
+    url.searchParams.append('sanctionsStatus', sanctionsStatus);
   }
-  
-  
+
+  try {
+    const response = await axios.get(url.toString(), {
+      headers: {
+        'Accept': 'application/json', 
+      }
+    });
+    return response.data;
+  } catch (error: any) {
+    console.error('Error fetching parties:', error);
+    throw new Error('Failed to fetch parties');
+  }
+}

@@ -4,6 +4,8 @@ import { setupPartyApiMock } from '../../features/test-utils/apiMock';
 
 test.describe('Performing a Party Search', () => {
 
+  const PARTIES_ENDPOINT = '/api/parties'; 
+
     test.beforeEach(async ({ page, dashboardPage }) => {
         await dashboardPage.navigate();
     });
@@ -226,7 +228,7 @@ test.describe('Performing a Party Search', () => {
       
           await Promise.all([
             page.waitForResponse(response => 
-              response.url().includes('/api/parties') &&
+              response.url().includes(PARTIES_ENDPOINT) && 
               response.url().includes('sanctionsStatus=Approved')
             ),
             dashboardPage.selectSanctionsStatus('Approved')
