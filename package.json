@@ -24,9 +24,11 @@
     "start:servers": "concurrently -k -n backend,frontend \"npm run start:backend\" \"npm start\"",
     "wait:servers": "wait-on tcp:5044 tcp:3000",
 
-    "test": "react-scripts test",
-    "test:unit": "react-scripts test",
-    "test:component:ui": "playwright test",
+    "test": "npm run test:unit && npm run test:component:ui && npm run test:acceptance:all",
+
+    "test:unit": "cross-env CI=true react-scripts test --ci --passWithNoTests",
+    "test:unit:dev": "react-scripts test",
+    "test:component:ui": "playwright test --reporter=list",
 
     "test:acceptance:ui": "start-server-and-test start http://localhost:3000 \"cucumber-js features/ui/**/*.feature --require features\"",
     "test:acceptance:e2e": "start-server-and-test start:servers http://localhost:3000 \"npm run test:acceptance:e2e:run\"",

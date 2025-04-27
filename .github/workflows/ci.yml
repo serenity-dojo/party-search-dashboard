@@ -24,9 +24,6 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install
 
-      - name: Run Playwright tests
-        run: npm run test:e2e
-
-      - name: Run Cucumber tests
-        run: npm run test:cucumber
+      - name: Run all tests
+        run: npm run test
 
