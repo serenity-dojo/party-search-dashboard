@@ -19,7 +19,7 @@ export class DashboardPage {
         this.partySuggestions = page.locator('[data-testid^=suggestion-]');}
 
     async navigate() {
-        await this.page.goto('http://localhost:3000', { timeout: 10000 });
+        await this.page.goto('http://localhost:3000', { timeout: 10000, waitUntil: 'domcontentloaded' });
     }
 
     /**
